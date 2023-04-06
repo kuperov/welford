@@ -21,7 +21,7 @@ def _parse_requirements(req_path):
 
 setup(
     name="welford",
-    version="0.0.1",
+    version="0.0.2",
     description="Welford algorithms",
     long_description=long_description,
     author="Alex Cooper",
