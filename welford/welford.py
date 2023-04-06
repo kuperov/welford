@@ -1,6 +1,5 @@
 from typing import NamedTuple
 
-import chex
 import jax
 import jax.numpy as jnp
 from jax.scipy.special import logsumexp
@@ -9,14 +8,14 @@ from jax.scipy.special import logsumexp
 class WelfordState(NamedTuple):
     """Welford state object for univariate data."""
 
-    K: chex.Array  # central estimate of data
-    Ex: chex.Array  # sum of deviations from K
-    Eax: chex.Array  # sum of absolute deviations from K
-    Ex2: chex.Array  # sum of squared deviations from K
-    n: chex.Array  # number of data points
+    K: jax.Array  # central estimate of data
+    Ex: jax.Array  # sum of deviations from K
+    Eax: jax.Array  # sum of absolute deviations from K
+    Ex2: jax.Array  # sum of squared deviations from K
+    n: jax.Array  # number of data points
 
 
-def welford_init(K: chex.Array) -> WelfordState:
+def welford_init(K: jax.Array) -> WelfordState:
     """Initialize new welford algorithm state.
 
     Args:
@@ -25,7 +24,7 @@ def welford_init(K: chex.Array) -> WelfordState:
     return WelfordState(K=K * 1.0, Ex=K * 0.0, Eax=K * 0.0, Ex2=K * 0.0, n=K * 0)
 
 
-def welford_add(x: chex.Array, state: WelfordState) -> WelfordState:
+def welford_add(x: jax.Array, state: WelfordState) -> WelfordState:
     return WelfordState(
         K=state.K,
         Ex=state.Ex + x - state.K,
@@ -72,7 +71,7 @@ class BatchWelfordState(NamedTuple):
     batches: WelfordState
 
 
-def batch_welford_init(K: chex.Array, batch_size: int) -> BatchWelfordState:
+def batch_welford_init(K: jax.Array, batch_size: int) -> BatchWelfordState:
     return BatchWelfordState(
         batch_size=batch_size,
         current=welford_init(K=K),
@@ -80,7 +79,7 @@ def batch_welford_init(K: chex.Array, batch_size: int) -> BatchWelfordState:
     )
 
 
-def batch_welford_add(x: chex.Array, state: BatchWelfordState) -> BatchWelfordState:
+def batch_welford_add(x: jax.Array, state: BatchWelfordState) -> BatchWelfordState:
     upd_current = welford_add(x, state.current)
 
     def incr_batch():
@@ -133,7 +132,6 @@ def vector_welford_init(K: jax.Array) -> VectorWelfordState:
     Args:
       K: estimated mean vector of data. Vector.
     """
-    chex.assert_rank(K, 1)
     return VectorWelfordState(
         K=K,
         Ex=jnp.zeros_like(K),
@@ -361,7 +359,7 @@ def batch_log_welford_init(shape: tuple, batch_size: int) -> BatchLogWelfordStat
 
 
 def batch_log_welford_add(
-    x: chex.Array, state: BatchLogWelfordState
+    x: jax.Array, state: BatchLogWelfordState
 ) -> BatchLogWelfordState:
     upd_current = log_welford_add(x, state.current)
 
