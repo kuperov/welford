@@ -67,7 +67,6 @@ __all__ = [
     "vector_welford_cov_combine",
     "vector_welford_init",
     "vector_welford_mean",
-    "welford",
     "welford_add",
     "welford_init",
     "welford_mad",
