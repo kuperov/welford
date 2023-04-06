@@ -1,4 +1,4 @@
-from welford.welford import (
+from welford._welford import (
     BatchLogWelfordState,
     BatchVectorWelfordState,
     BatchWelfordState,
