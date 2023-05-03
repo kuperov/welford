@@ -279,7 +279,7 @@ def log_welford_var(state: LogWelfordState, ddof=0):
 
 
 def log_welford_var_combine(
-    state: LogWelfordState, ddof: int = 0, comb_axis: int = 1, out_axis: int = 0
+    state: LogWelfordState, ddof: int = 0, axis: int = 0
 ):
     """Univariate variance for data from multiple welford states
 
@@ -288,24 +288,19 @@ def log_welford_var_combine(
     Args:
         state: log welford state, for measures in logs
         ddof (int): degrees of freedom
-        comb_axis (tuple): axis over which to combine data
-        out_axis (int): axis over which to return results
+        axis (tuple): axis over which to combine data
 
     Return:
         array of log variances of length of out_axis
     """
-    log_ex2 = logsumexp(state.logEx2, axis=comb_axis)
-    log_ex = logsumexp(state.logEx, axis=comb_axis)
-    n = state.n.sum(axis=comb_axis)
-
-    def f(i):
-        return (
-            log_ex2[i]
-            + jnp.log1p(-jnp.exp(2 * log_ex[i] - log_ex2[i] - jnp.log(n[i])))
-            - jnp.log(n[i] - ddof)
-        )
-
-    return jax.vmap(f)(jnp.arange(log_ex2.shape[out_axis]))
+    log_ex2 = logsumexp(state.logEx2, axis=axis)
+    log_ex = logsumexp(state.logEx, axis=axis)
+    n = state.n.sum(axis=axis)
+    return (
+        log_ex2
+        + jnp.log1p(-jnp.exp(2 * log_ex - log_ex2 - jnp.log(n)))
+        - jnp.log(n - ddof)
+    )
 
 
 def log_welford_log_var_combine(
