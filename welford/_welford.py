@@ -277,7 +277,7 @@ def log_welford_var(state: LogWelfordState, ddof=0):
         + state.logEx2
         + jnp.log1p(-jnp.exp(a))
     )
-    return jnp.where(a <= 0, log_var, -jnp.inf)
+    return jnp.where(a < 0, log_var, -jnp.inf)
 
 
 def log_welford_var_combine(
