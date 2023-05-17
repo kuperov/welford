@@ -55,6 +55,13 @@ class TestLogWelford(unittest.TestCase):
             log_welford_var(w, ddof=1), jnp.log(jnp.var(xs, ddof=1)), places=2
         )
 
+    # def testZeroVar(self):
+    #     w = log_welford_init(shape=tuple())
+    #     for _ in range(5):
+    #         w = log_welford_add(-1, w)  # add 1/e
+    #     self.assertEqual(log_welford_mean(w), -1)
+    #     self.assertEqual(log_welford_var(w), -jnp.inf)
+
     def testLargeSample(self):
         w0 = log_welford_init(shape=tuple())
         key = jax.random.PRNGKey(0)
@@ -118,6 +125,21 @@ class TestMultivariateWelford(unittest.TestCase):
         self.assertLess(
             jnp.linalg.norm(vector_welford_mean(w) - data.mean(axis=0)), 1e-5
         )
+
+    # def testCombinedMoments(self):
+    #     key = jax.random.PRNGKey(0)
+    #     covL = jax.random.normal(key=key, shape=(6, 6))
+    #     cov = jnp.dot(covL, covL.T)
+    #     data = jax.random.multivariate_normal(
+    #         key=key,
+    #         mean=jnp.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0]),
+    #         cov=cov,
+    #         shape=(1000,),
+    #     )
+    #     data3D = data.reshape(1000, 2, 3)
+    #     w0 = jax.vmap(lambda _: vector_welford_init(K=jnp.zeros(3)))(jnp.arange(2))
+    #     w, _ = jax.vmap(lambda x: jax.lax.scan(lambda w_carry, x: (vector_welford_add(x, w_carry), None), w0, x))(data3D)
+
 
     def testBatchVectorMoments(self):
         n, b, p = 100, 10, 3

@@ -271,11 +271,13 @@ def log_welford_mean(state: LogWelfordState):
 
 def log_welford_var(state: LogWelfordState, ddof=0):
     # NB: Not valid if n <= 1
-    return (
+    a = 2 * state.logEx - jnp.log(state.n) - state.logEx2
+    log_var = (
         -jnp.log(state.n - ddof)
         + state.logEx2
-        + jnp.log1p(-jnp.exp(2 * state.logEx - jnp.log(state.n) - state.logEx2))
+        + jnp.log1p(-jnp.exp(a))
     )
+    return jnp.where(a <= 0, log_var, -jnp.inf)
 
 
 def log_welford_var_combine(
